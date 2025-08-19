@@ -1,0 +1,56 @@
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "m5-forecasting"
+version = "0.1.0"
+description = "M5 forecasting with quantile LightGBM, rolling backtests, MLflow & Prefect"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "Hubert Murawski", email = "hubertmurawski9@gmail.com"}]
+
+dependencies = [
+"polars>=0.20",
+"duckdb>=0.10",
+"lightgbm>=4.0",
+"optuna>=3.5",
+"mlflow>=2.10",
+"prefect>=2.14",
+"evidently>=0.4",
+"psycopg[binary]>=3.1", # PostgreSQL client (v3)
+"python-dotenv>=1.0",
+"pydantic>=2.5",
+"numpy>=1.26",
+"pandas>=2.2"
+]
+
+
+[project.optional-dependencies]
+dev = [
+"black==24.4.2",
+"ruff==0.4.9",
+"isort==5.13.2",
+"pytest>=7.4",
+"ipykernel>=6.29",
+"pre-commit>=3.7",]
+
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "UP", "B"]
+ignore = []
+
+
+[tool.ruff.isort]
+known-first-party = ["m5_forecasting"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

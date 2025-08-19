@@ -1,0 +1,63 @@
+# =====================
+# Python bytecode & cache
+# =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# =====================
+# Virtual environments
+# =====================
+.venv/
+env/
+ENV/
+venv/
+
+# =====================
+# Data artifacts
+# =====================
+/data/processed/
+/data/warehouse/
+/data/**/*.parquet
+/data/**/*.duckdb
+/mlruns/
+*.db
+*.sqlite
+*.log
+*.csv
+*.tsv
+
+# =====================
+# Jupyter
+# =====================
+.ipynb_checkpoints/
+
+# =====================
+# Build artifacts
+# =====================
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# =====================
+# System files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Environment files
+# =====================
+.env
+.env.*
+
+# =====================
+# VSCode
+# =====================
+.vscode/
