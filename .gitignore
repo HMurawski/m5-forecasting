@@ -44,7 +44,7 @@ dist/
 *.egg-info/
 *.egg
 *.whl
-
+.ruff_cache
 # =====================
 # System files
 # =====================
