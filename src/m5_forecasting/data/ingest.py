@@ -1,4 +1,4 @@
-"""M5 ingest: melt sales, join calendar & prices, persist to Parquet and DuckDB.
+"""M5 ingest: unpivot sales, join calendar & prices, persist to Parquet and DuckDB.
 
 
 Run: python -m m5_forecasting.data.ingest
@@ -56,11 +56,13 @@ def _read_prices(path: Path) -> pl.DataFrame:
         raise
 
 
-def melt_sales(df: pl.DataFrame) -> pl.DataFrame:
+def unpivot_sales(df: pl.DataFrame) -> pl.DataFrame:
     """Wide (d_1..d_1913) -> long with (d, units)."""
     id_vars = ["id", "item_id", "dept_id", "cat_id", "store_id", "state_id"]
     value_vars = [c for c in df.columns if c.startswith("d_")]
-    long_df = df.melt(id_vars=id_vars, value_vars=value_vars, variable_name="d", value_name="units")
+
+    long_df = df.unpivot(index=id_vars, on=value_vars, variable_name="d", value_name="units")
+
     long_df = long_df.with_columns(
         [
             pl.col("units").cast(pl.Int32),
@@ -173,7 +175,7 @@ def main() -> None:
     calendar = _read_calendar(RAW_DIR / "calendar.csv")
     prices = _read_prices(RAW_DIR / "sell_prices.csv")
 
-    sales_long = melt_sales(sales)
+    sales_long = unpivot_sales(sales)
     fact = join_calendar_prices(sales_long, calendar, prices)
     path = write_outputs(fact)
 
