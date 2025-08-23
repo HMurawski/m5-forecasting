@@ -55,3 +55,10 @@ known-first-party = ["m5_forecasting"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["m5_forecasting*"]

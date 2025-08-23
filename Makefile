@@ -7,6 +7,7 @@ setup:
 	python -m venv .venv
 	$(VENV_PY) -m pip install -U pip
 	$(VENV_PY) -m pip install -e ".[dev]"
+	$(VENV_PY) -m pip install -r requirements-dev.txt
 
 precommit-install:
 	$(VENV_PY) -m pre_commit install
