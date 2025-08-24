@@ -82,10 +82,10 @@ def join_calendar_prices(sales_long: pl.DataFrame, calendar: pl.DataFrame, price
     cal = calendar.select(
         [
             pl.col("d"),
-            pl.col("date").str.strptime(pl.Date, fmt="%Y-%m-%d"),
+            pl.col("date").str.to_date().alias("date"),
             pl.col("wm_yr_wk").cast(pl.Int32),
-            "wday",
-            "week",
+            "wday",  # 1..7
+            "weekday",
             "month",
             "year",
             "event_name_1",
@@ -97,7 +97,10 @@ def join_calendar_prices(sales_long: pl.DataFrame, calendar: pl.DataFrame, price
             "snap_WI",
         ]
     )
+
+    # Join sales + calendar
     joined = sales_long.join(cal, on="d", how="left")
+
     joined = joined.with_columns(
         pl.when(pl.col("state_id") == "CA")
         .then(pl.col("snap_CA"))
@@ -108,10 +111,12 @@ def join_calendar_prices(sales_long: pl.DataFrame, calendar: pl.DataFrame, price
         .cast(pl.Int8)
     ).drop(["snap_CA", "snap_TX", "snap_WI"])
 
-    price_cols = ["store_id", "item_id", "wm_yr_wk", "sell_price"]
-    prices_sel = prices.select(price_cols)
+    prices_sel = prices.with_columns(pl.col("wm_yr_wk").cast(pl.Int32)).select(
+        ["store_id", "item_id", "wm_yr_wk", "sell_price"]
+    )
+
     out = joined.join(prices_sel, on=["store_id", "item_id", "wm_yr_wk"], how="left")
-    # Optional ordering for readability
+
     out = out.select(
         [
             "date",
@@ -127,7 +132,7 @@ def join_calendar_prices(sales_long: pl.DataFrame, calendar: pl.DataFrame, price
             "sell_price",
             "wm_yr_wk",
             "wday",
-            "week",
+            "weekday",
             "month",
             "year",
             "event_name_1",
@@ -147,11 +152,12 @@ def write_outputs(df: pl.DataFrame) -> Path:
 
     DUCKDB_PATH.parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(DUCKDB_PATH))
-    con.execute("CREATE SCHEMA IF NOT EXISTS m5")
+    schema = "core"
+    con.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
     # DuckDB can read Parquet directly — zero copy into table
     con.execute(
         f"""
-    CREATE OR REPLACE TABLE m5.fact_sales AS
+    CREATE OR REPLACE TABLE {schema}.fact_sales AS
     SELECT *
     FROM read_parquet('{parquet_path.as_posix()}')
     """
